@@ -1,6 +1,8 @@
 # gnome-shell-extension-ideapad
 Lenovo IdeaPad goodies for GNOME Shell
 
+*At the moment the extension only provides an easy and user-friendly way to toggle the battery conservation mode available on the Levono Ideapad laptops and visually get its current state.*
+
 # Installation
 
 # Additional Required Settings
