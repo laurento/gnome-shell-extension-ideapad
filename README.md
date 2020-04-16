@@ -9,7 +9,7 @@ Download or clone the repository under `~/.local/share/gnome-shell/extensions/id
 # Usage
 The extension adds a new entry *Toggle Conservation Mode* to the panel and shows an icon on the status menu to indicate when the battery conservation mode is enabled.
 
-If your particular laptop model supports it, the conservation mode limits battery charging to 55-60% of its capacity to improve battery life, being most useful when the laptop tends to run on external power much of the time.
+If your particular laptop model supports it, the conservation mode limits battery charging to 55-60% of its capacity to improve battery life. It is particularly useful when the laptop runs on external power most of the time.
 
 # Additional Required Settings
 Your desktop user needs read-and-write access to a specific sysfs file that is normally owned by the root user. The easiest way to achieve that is using `sudo`. The following steps have been tested on Debian, but they should work on any modern GNU/Linux system. In case of doubts, please refer to your specific distribution documentation.
