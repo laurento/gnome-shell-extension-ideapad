@@ -20,6 +20,7 @@
 const St = imports.gi.St;
 const Config = imports.misc.config;
 const Gio = imports.gi.Gio;
+const GObject = imports.gi.GObject;
 const Main = imports.ui.main;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
@@ -27,49 +28,62 @@ const Util = imports.misc.util;
 
 const PanelMenu = imports.ui.panelMenu;
 const aggregateMenu = Main.panel.statusArea.aggregateMenu;
-const powerIndicator = aggregateMenu._power.indicators;
+const powerIndicator = _getIndicators(aggregateMenu._power);
 const powerMenu = aggregateMenu._power.menu.firstMenuItem.menu;
 
-let icon, item;
+let icon = null;
+let item = null;
 // MANUAL OVERRIDE
 // to disable the auto-discovery more, just set the absolute device path here
 // E.g.: "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
 let sys_conservation = null;
 
+let BatteryConservationIndicator = GObject.registerClass(
+  {
+    GTypeName: 'BatteryConservationIndicator'
+  },
+  class BatteryConservationIndicator extends PanelMenu.SystemIndicator {
+    _init(a, b) {
+      super._init(a);
 
-class BatteryConservationIndicator extends PanelMenu.SystemIndicator {
-  constructor() {
-    super();
+      this._indicator = this._addIndicator();
+      this._indicator.icon_name = "emoji-nature-symbolic";
 
-    this._indicator = this._addIndicator();
-    this._indicator.icon_name = "emoji-nature-symbolic";
+      // Monitor the changes and show or hide the indicator accordingly.
+      const fileM = Gio.file_new_for_path(sys_conservation);
+      this._monitor = fileM.monitor(Gio.FileMonitorFlags.NONE, null);
+      this._monitor.connect('changed', Lang.bind(this, this._syncStatus));
+      //this._monitor.connect('changed', () => this._syncStatus);
 
-    // Monitor the changes and show or hide the indicator accordingly.
-    const fileM = Gio.file_new_for_path(sys_conservation);
-    this._monitor = fileM.monitor(Gio.FileMonitorFlags.NONE, null);
-    this._monitor.connect('changed', Lang.bind(this, this._syncStatus));
-    //this._monitor.connect('changed', () => this._syncStatus);
+      // Set the initial and proper indicator status.
+      this._syncStatus();
+    }
 
-    // Set the initial and proper indicator status.
-    this._syncStatus();
+    _syncStatus() {
+      const status = Shell.get_file_contents_utf8_sync(sys_conservation);
+      (status.trim() == "1") ? this._indicator.show() : this._indicator.hide();
+    }
+
+    static _toggleConservationMode() {
+      const status = Shell.get_file_contents_utf8_sync(sys_conservation);
+      const new_status = (status.trim() == "1") ? "0" : "1";
+
+      Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`)
+    }
+
+    destroy() {
+      this._indicator.destroy();
+      this._monitor.cancel();
+    }
+  }
+);
+
+function _getIndicators(delegate) {
+  if (delegate instanceof St.BoxLayout) {
+    return delegate;
   }
 
-  _syncStatus() {
-    const status = Shell.get_file_contents_utf8_sync(sys_conservation);
-    (status.trim() == "1") ? this._indicator.show() : this._indicator.hide();
-  }
-
-  static _toggleConservationMode() {
-    const status = Shell.get_file_contents_utf8_sync(sys_conservation);
-    const new_status = (status.trim() == "1") ? "0" : "1";
-
-    Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`)
-  }
-
-  destroy() {
-    this._indicator.destroy();
-    this._monitor.cancel();
-  }
+  return delegate.indicators;
 }
 
 function _auto_dev_discovery(search_path) {
@@ -111,7 +125,7 @@ function init() {
 
 function enable() {
   icon = new BatteryConservationIndicator();
-  powerIndicator.add_child(icon.indicators);
+  powerIndicator.add_child(_getIndicators(icon));
 
   item = powerMenu.addAction(
     _("Toggle Conservation Mode"),
