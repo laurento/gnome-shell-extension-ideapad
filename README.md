@@ -4,7 +4,9 @@ Lenovo IdeaPad goodies for GNOME Shell
 *At the moment the extension only provides an easy and user-friendly way to toggle the battery conservation mode available on Levono Ideapad laptops and visually get its current state.*
 
 # Installation
-Download or clone the repository under `~/.local/share/gnome-shell/extensions/ideapad@laurento.frittella`
+Simply install the extension from the ![official GNOME extensions website](https://extensions.gnome.org/extension/2992/ideapad/) (recommended). Alternatively, manually download or clone the repository under `~/.local/share/gnome-shell/extensions/ideapad@laurento.frittella`
+
+In both cases, few additional steps are required. Please check the dedicate following section.
 
 # Usage
 The extension adds a new entry *Toggle Conservation Mode* to the panel and shows an icon on the status menu to indicate when the battery conservation mode is enabled.
