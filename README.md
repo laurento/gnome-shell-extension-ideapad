@@ -4,7 +4,7 @@ Lenovo IdeaPad goodies for GNOME Shell
 *At the moment the extension only provides an easy and user-friendly way to toggle the battery conservation mode available on Levono Ideapad laptops and visually get its current state.*
 
 # Installation
-Simply install the extension from the ![official GNOME extensions website](https://extensions.gnome.org/extension/2992/ideapad/) (recommended). Alternatively, manually download or clone the repository under `~/.local/share/gnome-shell/extensions/ideapad@laurento.frittella`
+Simply install the extension from the [official GNOME extensions website](https://extensions.gnome.org/extension/2992/ideapad/) (recommended). Alternatively, manually download or clone the repository under `~/.local/share/gnome-shell/extensions/ideapad@laurento.frittella`
 
 In both cases, few additional steps are required. Please check the dedicate following section.
 
@@ -22,6 +22,8 @@ Add the following entry to your system sudoers configuration (e.g. `/etc/sudoers
 ~~~
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/tee /sys/bus/platform/drivers/ideapad_acpi/VPC????\:??/conservation_mode
 ~~~
+if you re using ArchLinux, change `%sudo` to `%wheel`
+
 To make sure the `ideapad_laptop` kernel module gets loaded automatically at boot, simply add it to the file `/etc/modules`
 
 To summarize and for easy reference...
