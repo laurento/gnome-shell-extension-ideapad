@@ -31,3 +31,10 @@ To summarize and for easy reference...
 $ echo "%sudo ALL=(ALL) NOPASSWD: /usr/bin/tee /sys/bus/platform/drivers/ideapad_acpi/VPC????\:??/conservation_mode" | sudo tee /etc/sudoers.d/ideapad
 $ echo "ideapad_laptop" | sudo tee -a /etc/modules
 ~~~
+
+# Wrong battery estimation displayed
+A very minor cosmetic issue does currently exist. However, if the wrong battery estimation displayed in GNOME bugs you, there is also a solution.
+
+When battery conservation mode is enabled, uPower (at least v0.99.11) doesn't seem able to properly identify the battery status just after the charging stops at 60%. More in particular, looking at the relevant uPower source code, one can read `/* the battery isn't charging or discharging, it's just sitting there half full doing nothing: try to guess a state */`. Unfortunately, the guessing fails resulting in exotic battery charging time readings.
+
+I've already reported the issue upstream; you can find [my proposed patch in the bug report](https://gitlab.freedesktop.org/upower/upower/-/issues/120). The patch essentially puts the conservation mode in the game and, when the battery stops charging, uPower simply understands the reason why.
