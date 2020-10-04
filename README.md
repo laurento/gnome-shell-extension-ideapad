@@ -4,7 +4,9 @@ Lenovo IdeaPad goodies for GNOME Shell
 *At the moment the extension only provides an easy and user-friendly way to toggle the battery conservation mode available on Levono Ideapad laptops and visually get its current state.*
 
 # Installation
-Download or clone the repository under `~/.local/share/gnome-shell/extensions/ideapad@laurento.frittella`
+Simply install the extension from the [official GNOME extensions website](https://extensions.gnome.org/extension/2992/ideapad/) (recommended). Alternatively, manually download or clone the repository under `~/.local/share/gnome-shell/extensions/ideapad@laurento.frittella`
+
+In both cases, few additional steps are required. Please check the dedicate following section.
 
 # Usage
 The extension adds a new entry *Toggle Conservation Mode* to the panel and shows an icon on the status menu to indicate when the battery conservation mode is enabled.
@@ -20,6 +22,8 @@ Add the following entry to your system sudoers configuration (e.g. `/etc/sudoers
 ~~~
 %sudo ALL=(ALL) NOPASSWD: /usr/bin/tee /sys/bus/platform/drivers/ideapad_acpi/VPC????\:??/conservation_mode
 ~~~
+if you re using ArchLinux, change `%sudo` to `%wheel`
+
 To make sure the `ideapad_laptop` kernel module gets loaded automatically at boot, simply add it to the file `/etc/modules`
 
 To summarize and for easy reference...
@@ -27,3 +31,10 @@ To summarize and for easy reference...
 $ echo "%sudo ALL=(ALL) NOPASSWD: /usr/bin/tee /sys/bus/platform/drivers/ideapad_acpi/VPC????\:??/conservation_mode" | sudo tee /etc/sudoers.d/ideapad
 $ echo "ideapad_laptop" | sudo tee -a /etc/modules
 ~~~
+
+# Wrong battery estimation displayed
+A very minor cosmetic issue does currently exist. However, if the wrong battery estimation displayed in GNOME bugs you, there is also a solution.
+
+When battery conservation mode is enabled, uPower (at least v0.99.11) doesn't seem able to properly identify the battery status just after the charging stops at 60%. More in particular, looking at the relevant uPower source code, one can read `/* the battery isn't charging or discharging, it's just sitting there half full doing nothing: try to guess a state */`. Unfortunately, the guessing fails resulting in exotic battery charging time readings.
+
+I've already reported the issue upstream; you can find [my proposed patch in the bug report](https://gitlab.freedesktop.org/upower/upower/-/issues/120). The patch essentially puts the conservation mode in the game and, when the battery stops charging, uPower simply understands the reason why.
