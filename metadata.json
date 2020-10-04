@@ -3,8 +3,9 @@
   "description": "Lenovo IdeaPad goodies for Gnome Shell",
   "uuid": "ideapad@laurento.frittella",
   "shell-version": [
-    "3.36"
+    "3.36",
+    "3.38"
   ],
   "url": "https://github.com/laurento/gnome-shell-extension-ideapad",
-  "version": 2
+  "version": 3
 }
