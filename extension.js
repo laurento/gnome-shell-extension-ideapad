@@ -44,17 +44,6 @@ const BatteryConservationIndicator = GObject.registerClass(
     _init() {
       super._init();
 
-//// TODO: uncomment this block when show-battery-percentage is saved (FIXME below)
-//      // GSettings 
-//      this.settings = new Gio.Settings({
-//        schema: 'org.gnome.desktop.interface',
-//        path: '/org/gnome/desktop/interface/',
-//      });
-
-//// FIXME: find a way to save this setting, so it can be restored when the extension is disabled or restarted
-////        if `this.show_percentage` is set to `true`, the percentage is replaced by the leaf icon when CM is active
-//      this.show_percentage = this.settings.get_boolean('show-battery-percentage');
-
       this._indicator = this._addIndicator();
       this._indicator.icon_name = "emoji-nature-symbolic";
       powerIndicator.add_child(_getIndicators(this));
@@ -63,7 +52,7 @@ const BatteryConservationIndicator = GObject.registerClass(
       const fileM = Gio.file_new_for_path(sys_conservation);
       this._monitor = fileM.monitor(Gio.FileMonitorFlags.NONE, null);
       this._monitor.connect('changed', Lang.bind(this, this._syncStatus));
-      
+
       this._item = powerMenu.addAction(
         _("Toggle Conservation Mode"),
         BatteryConservationIndicator._toggleConservationMode
@@ -77,8 +66,7 @@ const BatteryConservationIndicator = GObject.registerClass(
       const status = Shell.get_file_contents_utf8_sync(sys_conservation);
       const active = (status.trim() == "1");
       this._indicator.visible = active;
-      this._item.label.text = _("Turn " + (active ? "off" : "on") + " Conservation Mode");
-//      this.settings.set_boolean('show-battery-percentage', this.show_percentage && !active); // TODO: uncomment
+      this._item.label.text = _(`Turn Conservation Mode ${active ? 'Off' : 'On'}`);
     }
 
     static _toggleConservationMode() {
@@ -92,7 +80,6 @@ const BatteryConservationIndicator = GObject.registerClass(
       this._indicator.destroy();
       this._item.destroy();
       this._monitor.cancel();
-//      this.settings.set_boolean('show-battery-percentage', this.show_percentage); // TODO: uncomment
     }
   }
 );
@@ -142,10 +129,10 @@ function init() {
   }
 }
 
-var batteryConservationIndicator = null;
+let batteryConservationIndicator = null;
 
 function enable() {
-  batteryConservationIndicator = new BatteryConservationIndicator()
+  batteryConservationIndicator = new BatteryConservationIndicator();
 }
 
 function disable() {
