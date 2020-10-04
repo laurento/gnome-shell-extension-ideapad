@@ -31,29 +31,32 @@ const aggregateMenu = Main.panel.statusArea.aggregateMenu;
 const powerIndicator = _getIndicators(aggregateMenu._power);
 const powerMenu = aggregateMenu._power.menu.firstMenuItem.menu;
 
-let icon = null;
-let item = null;
 // MANUAL OVERRIDE
 // to disable the auto-discovery more, just set the absolute device path here
 // E.g.: "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
 let sys_conservation = null;
 
-let BatteryConservationIndicator = GObject.registerClass(
+const BatteryConservationIndicator = GObject.registerClass(
   {
     GTypeName: 'BatteryConservationIndicator'
   },
   class BatteryConservationIndicator extends PanelMenu.SystemIndicator {
-    _init(a, b) {
-      super._init(a);
+    _init() {
+      super._init();
 
       this._indicator = this._addIndicator();
       this._indicator.icon_name = "emoji-nature-symbolic";
+      powerIndicator.add_child(_getIndicators(this));
 
       // Monitor the changes and show or hide the indicator accordingly.
       const fileM = Gio.file_new_for_path(sys_conservation);
       this._monitor = fileM.monitor(Gio.FileMonitorFlags.NONE, null);
       this._monitor.connect('changed', Lang.bind(this, this._syncStatus));
-      //this._monitor.connect('changed', () => this._syncStatus);
+
+      this._item = powerMenu.addAction(
+        _("Toggle Conservation Mode"),
+        BatteryConservationIndicator._toggleConservationMode
+      );
 
       // Set the initial and proper indicator status.
       this._syncStatus();
@@ -61,18 +64,21 @@ let BatteryConservationIndicator = GObject.registerClass(
 
     _syncStatus() {
       const status = Shell.get_file_contents_utf8_sync(sys_conservation);
-      (status.trim() == "1") ? this._indicator.show() : this._indicator.hide();
+      const active = (status.trim() == "1");
+      this._indicator.visible = active;
+      this._item.label.text = _(`Turn Conservation Mode ${active ? 'Off' : 'On'}`);
     }
 
     static _toggleConservationMode() {
       const status = Shell.get_file_contents_utf8_sync(sys_conservation);
       const new_status = (status.trim() == "1") ? "0" : "1";
 
-      Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`)
+      Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
     }
 
     destroy() {
       this._indicator.destroy();
+      this._item.destroy();
       this._monitor.cancel();
     }
   }
@@ -123,16 +129,13 @@ function init() {
   }
 }
 
-function enable() {
-  icon = new BatteryConservationIndicator();
-  powerIndicator.add_child(_getIndicators(icon));
+let batteryConservationIndicator = null;
 
-  item = powerMenu.addAction(
-    _("Toggle Conservation Mode"),
-    BatteryConservationIndicator._toggleConservationMode);
+function enable() {
+  batteryConservationIndicator = new BatteryConservationIndicator();
 }
 
 function disable() {
-  item.destroy();
-  icon.destroy();
+  batteryConservationIndicator.destroy();
+  batteryConservationIndicator = null;
 }
