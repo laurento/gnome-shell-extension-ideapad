@@ -5,9 +5,8 @@
   "shell-version": [
     "3.36",
     "3.38",
-    "40.0",
-    "40.1"
+    "40"
   ],
   "url": "https://github.com/laurento/gnome-shell-extension-ideapad",
-  "version": 3
+  "version": 4
 }
