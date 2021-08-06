@@ -2,6 +2,7 @@
   "name": "IdeaPad",
   "description": "Lenovo IdeaPad goodies for Gnome Shell",
   "uuid": "ideapad@laurento.frittella",
+  "gettext-domain": "ideapad",
   "shell-version": [
     "3.36",
     "3.38",

@@ -17,6 +17,9 @@
 
 //Author: Laurento Frittella <laurento.frittella at gmail dot com>
 
+const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
+const Gettext = imports.gettext;
 const St = imports.gi.St;
 const Config = imports.misc.config;
 const Gio = imports.gi.Gio;
@@ -25,6 +28,9 @@ const Main = imports.ui.main;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 const Util = imports.misc.util;
+
+const Domain = Gettext.domain(Me.metadata['gettext-domain']);
+const _ = Domain.gettext;
 
 const PanelMenu = imports.ui.panelMenu;
 const aggregateMenu = Main.panel.statusArea.aggregateMenu;
@@ -66,7 +72,10 @@ const BatteryConservationIndicator = GObject.registerClass(
       const status = Shell.get_file_contents_utf8_sync(sys_conservation);
       const active = (status.trim() == "1");
       this._indicator.visible = active;
-      this._item.label.text = _(`Turn Conservation Mode ${active ? 'Off' : 'On'}`);
+      if (active)
+      	this._item.label.text = _("Turn Conservation Mode Off")
+      else
+      	this._item.label.text = _("Turn Conservation Mode On");
     }
 
     static _toggleConservationMode() {
@@ -118,6 +127,7 @@ function _auto_dev_discovery(search_path) {
 }
 
 function init() {
+  ExtensionUtils.initTranslations(Me.metadata['gettext-domain']);
   let sysfs_path = "/sys/bus/platform/drivers/ideapad_acpi";
 
   if (sys_conservation === null) {
