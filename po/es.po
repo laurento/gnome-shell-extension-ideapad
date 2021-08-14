@@ -8,24 +8,24 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-07-30 19:00+0200\n"
-"PO-Revision-Date: 2021-07-30 19:43+0200\n"
+"PO-Revision-Date: 2021-08-11 16:55+0200\n"
+"Last-Translator: Óscar Fernández Díaz <oscfdezdz@tuta.io>\n"
 "Language-Team: \n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.3\n"
-"Last-Translator: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: es\n"
 
 #: extension.js:63
 msgid "Toggle Conservation Mode"
 msgstr "Alternar modo de conservación"
 
-#: extension.js:76
+#: extension.js:75
 msgid "Turn Conservation Mode Off"
 msgstr "Apagar modo de conservación"
 
-#: extension.js:78
+#: extension.js:75
 msgid "Turn Conservation Mode On"
 msgstr "Encender modo de conservación"

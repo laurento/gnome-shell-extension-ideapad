@@ -72,10 +72,7 @@ const BatteryConservationIndicator = GObject.registerClass(
       const status = Shell.get_file_contents_utf8_sync(sys_conservation);
       const active = (status.trim() == "1");
       this._indicator.visible = active;
-      if (active)
-      	this._item.label.text = _("Turn Conservation Mode Off")
-      else
-      	this._item.label.text = _("Turn Conservation Mode On");
+      this._item.label.text = active ? _("Turn Conservation Mode Off") : _("Turn Conservation Mode On");
     }
 
     static _toggleConservationMode() {
