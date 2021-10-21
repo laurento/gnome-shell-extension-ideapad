@@ -1,11 +1,11 @@
-# Spanish translation.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Óscar Fernández Díaz <oscfdezdz@tuta.io>, 2021.
+# Lenovo IdeaPad goodies, GNOME shell extension.
+# Copyright (C) 2019 Laurento Frittella
+# This file is distributed under the same license as the "Lenovo IdeaPad goodies" package.
+# Author: Óscar Fernández Díaz <oscfdezdz@tuta.io>, 2021.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: Lenovo IdeaPad goodies, GNOME shell extension\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-07-30 19:00+0200\n"
 "PO-Revision-Date: 2021-08-11 16:55+0200\n"

@@ -1,29 +1,31 @@
 # Lenovo IdeaPad goodies, GNOME shell extension.
 # Copyright (C) 2019 Laurento Frittella
 # This file is distributed under the same license as the "Lenovo IdeaPad goodies" package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Author: Laurento Frittella <laurento.frittella at gmail dot com>.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Lenovo IdeaPad goodies, GNOME shell extension\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-11 16:55+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2021-10-21 16:59+0200\n"
 "Language-Team: \n"
-"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"Last-Translator: Laurento Frittella <laurento.frittella at gmail dot com>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: it\n"
 
 #: extension.js:63
 msgid "Toggle Conservation Mode"
-msgstr ""
+msgstr "Attiva/Disattiva Modalità Conservazione"
 
 #: extension.js:75
 msgid "Turn Conservation Mode Off"
-msgstr ""
+msgstr "Disattiva Modalità Conservazione"
 
 #: extension.js:75
 msgid "Turn Conservation Mode On"
-msgstr ""
+msgstr "Attiva Modalità Conservazione"
