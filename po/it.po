@@ -1,5 +1,5 @@
 # Lenovo IdeaPad goodies, GNOME shell extension.
-# Copyright (C) 2019 Laurento Frittella
+# Copyright (C) 2019 - 2021 Laurento Frittella
 # This file is distributed under the same license as the "Lenovo IdeaPad goodies" package.
 # Author: Laurento Frittella <laurento.frittella at gmail dot com>.
 #

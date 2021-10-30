@@ -1,4 +1,4 @@
-//Copyright (C) 2019
+//Copyright (C) 2019 - 2021 Laurento Frittella
 
 //This file is part of Lenovo IdeaPad goodies.
 
@@ -9,11 +9,11 @@
 
 //Lenovo IdeaPad goodies is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //GNU General Public License for more details.
 
 //You should have received a copy of the GNU General Public License
-//along with Lenovo IdeaPad goodies.    If not, see <http://www.gnu.org/licenses/>.
+//along with Lenovo IdeaPad goodies.  If not, see <http://www.gnu.org/licenses/>.
 
 //Author: Laurento Frittella <laurento.frittella at gmail dot com>
 
