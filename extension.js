@@ -9,24 +9,19 @@
 
 //Lenovo IdeaPad goodies is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the
 //GNU General Public License for more details.
 
 //You should have received a copy of the GNU General Public License
-//along with Lenovo IdeaPad goodies.  If not, see <http://www.gnu.org/licenses/>.
+//along with Lenovo IdeaPad goodies.    If not, see <http://www.gnu.org/licenses/>.
 
 //Author: Laurento Frittella <laurento.frittella at gmail dot com>
 
 const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+const { Gio, GObject, Shell, St } = imports.gi;
 const Gettext = imports.gettext;
-const St = imports.gi.St;
-const Config = imports.misc.config;
-const Gio = imports.gi.Gio;
-const GObject = imports.gi.GObject;
 const Main = imports.ui.main;
-const Lang = imports.lang;
-const Shell = imports.gi.Shell;
+const Me = ExtensionUtils.getCurrentExtension();
 const Util = imports.misc.util;
 
 const Domain = Gettext.domain(Me.metadata['gettext-domain']);
@@ -43,106 +38,121 @@ const powerMenu = aggregateMenu._power.menu.firstMenuItem.menu;
 let sys_conservation = null;
 
 const BatteryConservationIndicator = GObject.registerClass(
-  {
-    GTypeName: 'BatteryConservationIndicator'
-  },
-  class BatteryConservationIndicator extends PanelMenu.SystemIndicator {
-    _init() {
-      super._init();
+    {
+        GTypeName: 'BatteryConservationIndicator'
+    },
+    class BatteryConservationIndicator extends PanelMenu.SystemIndicator {
+        _init() {
+            super._init();
+            this._monitor = null;
 
-      this._indicator = this._addIndicator();
-      this._indicator.icon_name = "emoji-nature-symbolic";
-      powerIndicator.add_child(_getIndicators(this));
+            this._indicator = this._addIndicator();
+            this._indicator.icon_name = "emoji-nature-symbolic";
+            powerIndicator.add_child(_getIndicators(this));
 
-      // Monitor the changes and show or hide the indicator accordingly.
-      const fileM = Gio.file_new_for_path(sys_conservation);
-      this._monitor = fileM.monitor(Gio.FileMonitorFlags.NONE, null);
-      this._monitor.connect('changed', Lang.bind(this, this._syncStatus));
+            if (sys_conservation !== null) {
+                this._item = powerMenu.addAction(
+                    "",
+                    BatteryConservationIndicator._toggleConservationMode
+                );
 
-      this._item = powerMenu.addAction(
-        _("Toggle Conservation Mode"),
-        BatteryConservationIndicator._toggleConservationMode
-      );
+                // Monitor the changes and show or hide the indicator accordingly.
+                const fileM = Gio.file_new_for_path(sys_conservation);
+                this._monitor = fileM.monitor(Gio.FileMonitorFlags.NONE, null);
+                this._monitor.connect('changed', this._syncStatus.bind(this));
 
-      // Set the initial and proper indicator status.
-      this._syncStatus();
+                // Set the initial and proper indicator status.
+                this._syncStatus();
+            } else {
+                this._item = powerMenu.addAction(
+                    _("Conservation mode is not available"),
+                    function () {}
+                );
+
+                this._indicator.visible = false;
+            }
+        }
+
+        _syncStatus() {
+            const status = Shell.get_file_contents_utf8_sync(sys_conservation);
+            const active = (status.trim() == "1");
+            this._indicator.visible = active;
+            this._item.label.text = active ? _("Turn Conservation Mode Off") : _("Turn Conservation Mode On");
+        }
+
+        static _toggleConservationMode() {
+            const status = Shell.get_file_contents_utf8_sync(sys_conservation);
+            const new_status = (status.trim() == "1") ? "0" : "1";
+
+            Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
+        }
+
+        destroy() {
+            this._indicator.destroy();
+            this._item.destroy();
+            if (this._monitor !== null) this._monitor.cancel();
+        }
     }
-
-    _syncStatus() {
-      const status = Shell.get_file_contents_utf8_sync(sys_conservation);
-      const active = (status.trim() == "1");
-      this._indicator.visible = active;
-      this._item.label.text = active ? _("Turn Conservation Mode Off") : _("Turn Conservation Mode On");
-    }
-
-    static _toggleConservationMode() {
-      const status = Shell.get_file_contents_utf8_sync(sys_conservation);
-      const new_status = (status.trim() == "1") ? "0" : "1";
-
-      Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
-    }
-
-    destroy() {
-      this._indicator.destroy();
-      this._item.destroy();
-      this._monitor.cancel();
-    }
-  }
 );
 
 function _getIndicators(delegate) {
-  if (delegate instanceof St.BoxLayout) {
-    return delegate;
-  }
+    if (delegate instanceof St.BoxLayout) {
+        return delegate;
+    }
 
-  return delegate.indicators;
+    return delegate.indicators;
 }
 
 function _auto_dev_discovery(search_path) {
-  let mod_path = Gio.file_new_for_path(search_path);
+    let mod_path = Gio.file_new_for_path(search_path);
 
-  let walker = mod_path.enumerate_children(
-    "standard::name",
-    Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
-    null);
+    let walker = mod_path.enumerate_children(
+        "standard::name",
+        Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
+        null);
 
-  let child = null;
-  let found = null;
-  while ((child = walker.next_file(null))) {
-    if (child.get_is_symlink() && child.get_name().startsWith("VPC2004")) {
-      // ideapad_device_ids[] from the kernel module ideapad_acpi.c
-      found = _auto_dev_discovery(`${search_path}/${child.get_name()}`);
-    } else if (child.get_name() == "conservation_mode") {
-      log(`IdeaPad device FOUND at ${search_path}`);
-      found = `${search_path}/${child.get_name()}`;
+    let child = null;
+    let found = null;
+    while ((child = walker.next_file(null))) {
+        if (child.get_is_symlink() && child.get_name().startsWith("VPC2004")) {
+            // ideapad_device_ids[] from the kernel module ideapad_acpi.c
+            found = _auto_dev_discovery(`${search_path}/${child.get_name()}`);
+        } else if (child.get_name() == "conservation_mode") {
+            log(`IdeaPad device FOUND at ${search_path}`);
+            found = `${search_path}/${child.get_name()}`;
+        }
+        // Stop as soon as the device is found.
+        if (found !== null) break;
     }
-    // Stop as soon as the device is found.
-    if (found !== null) break;
-  }
 
-  return found;
+    return found;
 }
 
 function init() {
-  ExtensionUtils.initTranslations(Me.metadata['gettext-domain']);
-  let sysfs_path = "/sys/bus/platform/drivers/ideapad_acpi";
-
-  if (sys_conservation === null) {
-    sys_conservation = _auto_dev_discovery(sysfs_path);
-
-    if (sys_conservation === null) {
-      throw new Error("Battery conservation mode not available.");
-    }
-  }
+    ExtensionUtils.initTranslations(Me.metadata['gettext-domain']);
 }
 
 let batteryConservationIndicator = null;
 
 function enable() {
-  batteryConservationIndicator = new BatteryConservationIndicator();
+    let sysfs_path = "/sys/bus/platform/drivers/ideapad_acpi";
+
+    if (sys_conservation === null) {
+        try {
+            sys_conservation = _auto_dev_discovery(sysfs_path);
+
+            if (sys_conservation === null) {
+                throw new Error("Battery conservation mode not available.");
+            }
+        } catch (e) {
+            logError(e, "ideapad");
+        }
+    }
+
+    batteryConservationIndicator = new BatteryConservationIndicator();
 }
 
 function disable() {
-  batteryConservationIndicator.destroy();
-  batteryConservationIndicator = null;
+    batteryConservationIndicator.destroy();
+    batteryConservationIndicator = null;
 }

@@ -18,14 +18,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: it\n"
 
-#: extension.js:63
-msgid "Toggle Conservation Mode"
-msgstr "Attiva/Disattiva Modalità Conservazione"
+#: extension.js:68
+msgid "Conservation mode is not available"
+msgstr "Modalità Conservazione non disponibile"
 
-#: extension.js:75
+#: extension.js:80
 msgid "Turn Conservation Mode Off"
 msgstr "Disattiva Modalità Conservazione"
 
-#: extension.js:75
+#: extension.js:80
 msgid "Turn Conservation Mode On"
 msgstr "Attiva Modalità Conservazione"

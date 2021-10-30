@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lenovo IdeaPad goodies, GNOME shell extension\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-11 16:55+0200\n"
+"POT-Creation-Date: 2021-10-30 15:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -16,14 +16,14 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:63
-msgid "Toggle Conservation Mode"
+#: extension.js:68
+msgid "Conservation mode is not available"
 msgstr ""
 
-#: extension.js:75
+#: extension.js:80
 msgid "Turn Conservation Mode Off"
 msgstr ""
 
-#: extension.js:75
+#: extension.js:80
 msgid "Turn Conservation Mode On"
 msgstr ""
