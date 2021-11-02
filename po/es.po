@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Lenovo IdeaPad goodies, GNOME shell extension\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-30 15:36+0200\n"
-"PO-Revision-Date: 2021-10-31 10:39+0100\n"
+"PO-Revision-Date: 2021-11-02 17:55+0100\n"
 "Last-Translator: Óscar Fernández Díaz <oscfdezdz@tuta.io>\n"
 "Language-Team: \n"
 "Language: es\n"
@@ -18,14 +18,10 @@ msgstr ""
 "X-Generator: Poedit 3.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: extension.js:68
+#: extension.js:55
+msgid "Conservation Mode"
+msgstr "Modo de conservación"
+
+#: extension.js:70
 msgid "Conservation mode is not available"
 msgstr "El modo de conservación no está disponible"
-
-#: extension.js:80
-msgid "Turn Conservation Mode Off"
-msgstr "Apagar modo de conservación"
-
-#: extension.js:80
-msgid "Turn Conservation Mode On"
-msgstr "Encender modo de conservación"

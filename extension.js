@@ -28,6 +28,7 @@ const Domain = Gettext.domain(Me.metadata['gettext-domain']);
 const _ = Domain.gettext;
 
 const PanelMenu = imports.ui.panelMenu;
+const PopupMenu = imports.ui.popupMenu;
 const aggregateMenu = Main.panel.statusArea.aggregateMenu;
 const powerIndicator = _getIndicators(aggregateMenu._power);
 const powerMenu = aggregateMenu._power.menu.firstMenuItem.menu;
@@ -51,10 +52,11 @@ const BatteryConservationIndicator = GObject.registerClass(
             powerIndicator.add_child(_getIndicators(this));
 
             if (sys_conservation !== null) {
-                this._item = powerMenu.addAction(
-                    "",
-                    BatteryConservationIndicator._toggleConservationMode
-                );
+                this._item = new PopupMenu.PopupSwitchMenuItem(_("Conservation Mode"), true);
+                this._item.connect('toggled', item => {
+                    BatteryConservationIndicator._setConservationMode(item.state);
+                });
+                powerMenu.addMenuItem(this._item);
 
                 // Monitor the changes and show or hide the indicator accordingly.
                 const fileM = Gio.file_new_for_path(sys_conservation);
@@ -77,13 +79,11 @@ const BatteryConservationIndicator = GObject.registerClass(
             const status = Shell.get_file_contents_utf8_sync(sys_conservation);
             const active = (status.trim() == "1");
             this._indicator.visible = active;
-            this._item.label.text = active ? _("Turn Conservation Mode Off") : _("Turn Conservation Mode On");
+            if (this._item.state != active) this._item.toggle();
         }
 
-        static _toggleConservationMode() {
-            const status = Shell.get_file_contents_utf8_sync(sys_conservation);
-            const new_status = (status.trim() == "1") ? "0" : "1";
-
+        static _setConservationMode(enabled) {
+            const new_status = (enabled) ? "1" : "0";
             Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
         }
 
