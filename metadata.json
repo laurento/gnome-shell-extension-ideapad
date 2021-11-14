@@ -1,6 +1,6 @@
 {
   "name": "IdeaPad",
-  "description": "Lenovo IdeaPad goodies for Gnome Shell",
+  "description": "Lenovo IdeaPad goodies for Gnome Shell\n\nAt the moment the extension only provides an easy and user-friendly way to toggle battery conservation mode available on Levono Ideapad laptops and visually get its current state.\n\nConfiguration needed! Please check the instruction on the homepage.",
   "uuid": "ideapad@laurento.frittella",
   "gettext-domain": "ideapad",
   "shell-version": [
