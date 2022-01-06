@@ -79,7 +79,7 @@ const BatteryConservationIndicator = GObject.registerClass(
             const status = Shell.get_file_contents_utf8_sync(sys_conservation);
             const active = (status.trim() == "1");
             this._indicator.visible = active;
-            if (this._item.state != active) this._item.toggle();
+            this._item.setToggleState(active);
         }
 
         static _setConservationMode(enabled) {
