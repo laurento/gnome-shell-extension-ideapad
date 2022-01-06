@@ -1,4 +1,4 @@
-//Copyright (C) 2019 - 2021 Laurento Frittella
+//Copyright (C) 2019 - 2022 Laurento Frittella
 
 //This file is part of Lenovo IdeaPad goodies.
 
