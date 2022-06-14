@@ -85,6 +85,7 @@ const BatteryConservationIndicator = GObject.registerClass(
         static _setConservationMode(enabled) {
             const new_status = (enabled) ? "1" : "0";
             Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
+            this._syncStatus();
         }
 
         destroy() {
