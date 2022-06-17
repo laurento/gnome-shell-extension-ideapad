@@ -45,7 +45,6 @@ const BatteryConservationIndicator = GObject.registerClass(
     class BatteryConservationIndicator extends PanelMenu.SystemIndicator {
         _init() {
             super._init();
-            this._monitor = null;
 
             this._indicator = this._addIndicator();
             this._indicator.icon_name = "emoji-nature-symbolic";
@@ -58,13 +57,8 @@ const BatteryConservationIndicator = GObject.registerClass(
                 });
                 powerMenu.addMenuItem(this._item);
 
-                // Monitor the changes and show or hide the indicator accordingly.
-                const fileM = Gio.file_new_for_path(sys_conservation);
-                this._monitor = fileM.monitor(Gio.FileMonitorFlags.NONE, null);
-                this._monitor.connect('changed', this._syncStatus.bind(this));
-
-                // Set the initial and proper indicator status.
                 this._syncStatus();
+
             } else {
                 this._item = powerMenu.addAction(
                     _("Conservation mode is not available"),
@@ -91,7 +85,6 @@ const BatteryConservationIndicator = GObject.registerClass(
         destroy() {
             this._indicator.destroy();
             this._item.destroy();
-            if (this._monitor !== null) this._monitor.cancel();
         }
     }
 );
