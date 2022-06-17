@@ -56,18 +56,17 @@ const BatteryConservationIndicator = GObject.registerClass(
             powerIndicator.add_child(_getIndicators(this));
 
             if (sys_conservation !== null) {
-                this._item = new PopupMenu.PopupSwitchMenuItem(_("Conservation Mode"), true);
+                this.conservationModeItem = new PopupMenu.PopupSwitchMenuItem(_("Conservation Mode"), true);
 
-
-                this._item.connect('toggled', item => {
+                this.conservationModeItem.connect('toggled', item => {
                     this._setConservationMode(item.state);
                 });
-                powerMenu.addMenuItem(this._item);
+                powerMenu.addMenuItem(this.conservationModeItem);
 
                 this._syncStatus();
 
             } else {
-                this._item = powerMenu.addAction(
+                this.conservationModeItem = powerMenu.addAction(
                     _("Conservation mode is not available"),
                     function () {}
                 );
@@ -101,7 +100,7 @@ const BatteryConservationIndicator = GObject.registerClass(
             const status = Shell.get_file_contents_utf8_sync(sys_conservation);
             const active = (status.trim() == "1");
             this._indicator.visible = active;
-            this._item.setToggleState(active);
+            this.conservationModeItem.setToggleState(active);
         }
 
         _setConservationMode(enabled) {
@@ -112,8 +111,7 @@ const BatteryConservationIndicator = GObject.registerClass(
 
         destroy() {
             this._indicator.destroy();
-            this._item.destroy();
-            aggregateMenu._power._proxy.disconnect(this._power_change_handle);
+            this.conservationModeItem.destroy();
         }
     }
 );
