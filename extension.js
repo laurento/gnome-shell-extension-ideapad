@@ -32,11 +32,16 @@ const PopupMenu = imports.ui.popupMenu;
 const aggregateMenu = Main.panel.statusArea.aggregateMenu;
 const powerIndicator = _getIndicators(aggregateMenu._power);
 const powerMenu = aggregateMenu._power.menu.firstMenuItem.menu;
+const UPower = imports.ui.status.power.UPower;
 
 // MANUAL OVERRIDE
 // to disable the auto-discovery more, just set the absolute device path here
 // E.g.: "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
 let sys_conservation = null;
+
+let conservation_level = 80;
+const conservation_hysteresis = 2;
+
 
 const BatteryConservationIndicator = GObject.registerClass(
     {
@@ -52,6 +57,8 @@ const BatteryConservationIndicator = GObject.registerClass(
 
             if (sys_conservation !== null) {
                 this._item = new PopupMenu.PopupSwitchMenuItem(_("Conservation Mode"), true);
+
+
                 this._item.connect('toggled', item => {
                     this._setConservationMode(item.state);
                 });
@@ -67,6 +74,27 @@ const BatteryConservationIndicator = GObject.registerClass(
 
                 this._indicator.visible = false;
             }
+
+            this._power_change_handle = aggregateMenu._power._proxy.connect('g-properties-changed', this.autoConservationMode.bind(this));
+
+            this.autoConservationMode();
+
+        autoConservationMode(){
+            const level = this._getBatteryLevel()
+            if (level >= conservation_level){
+                this._setConservationMode(true)
+            }
+            if (level < conservation_level - conservation_hysteresis){
+                this._setConservationMode(false)
+            }
+        }
+
+        _getBatteryStatus() {
+            return aggregateMenu._power._proxy.State
+        }
+
+        _getBatteryLevel() {
+            return aggregateMenu._power._proxy.Percentage
         }
 
         _syncStatus() {
@@ -85,6 +113,7 @@ const BatteryConservationIndicator = GObject.registerClass(
         destroy() {
             this._indicator.destroy();
             this._item.destroy();
+            aggregateMenu._power._proxy.disconnect(this._power_change_handle);
         }
     }
 );
