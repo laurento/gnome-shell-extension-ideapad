@@ -54,7 +54,7 @@ const BatteryConservationIndicator = GObject.registerClass(
             if (sys_conservation !== null) {
                 this._item = new PopupMenu.PopupSwitchMenuItem(_("Conservation Mode"), true);
                 this._item.connect('toggled', item => {
-                    BatteryConservationIndicator._setConservationMode(item.state);
+                    this._setConservationMode(item.state);
                 });
                 powerMenu.addMenuItem(this._item);
 
@@ -82,7 +82,7 @@ const BatteryConservationIndicator = GObject.registerClass(
             this._item.setToggleState(active);
         }
 
-        static _setConservationMode(enabled) {
+        _setConservationMode(enabled) {
             const new_status = (enabled) ? "1" : "0";
             Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
             this._syncStatus();
