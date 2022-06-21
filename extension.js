@@ -118,7 +118,8 @@ const BatteryConservationIndicator = GObject.registerClass(
             powerIndicator.add_child(_getIndicators(this));
 
             if (sys_conservation !== null) {
-                this.conservationModeItem = new PopupMenu.PopupSwitchMenuItem(_("Conservation Mode"), true);
+                this.conservationModeItem = new PopupMenu.PopupSwitchMenuItem(
+                    _("Conservation Mode"), true);
 
                 this.conservationModeItem.connect('toggled', item => {
                     this._setConservationMode(item.state);
@@ -130,7 +131,9 @@ const BatteryConservationIndicator = GObject.registerClass(
                     this._sliderChanged.bind(this));
                 powerMenu.addMenuItem(this.sliderMenuItem);
 
-                this._power_change_handle = powerProxy.connect('g-properties-changed', this.autoConservationMode.bind(this));
+                this._power_change_handle = powerProxy.connect(
+                    'g-properties-changed',
+                    this.autoConservationMode.bind(this));
                 this.autoConservationMode();
 
             } else {
