@@ -31,8 +31,8 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const aggregateMenu = Main.panel.statusArea.aggregateMenu;
 const powerIndicator = _getIndicators(aggregateMenu._power);
-const powerMenu = aggregateMenu._power.menu.firstMenuItem.menu;
-const UPower = imports.ui.status.power.UPower;
+const powerMenu = powerIndicator.menu.firstMenuItem.menu;
+const powerProxy = powerIndicator._proxy;
 
 // MANUAL OVERRIDE
 // to disable the auto-discovery more, just set the absolute device path here
