@@ -21,6 +21,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const { Gio, GObject, Shell, St } = imports.gi;
 const Gettext = imports.gettext;
 const Main = imports.ui.main;
+const Slider = imports.ui.slider;
 const Me = ExtensionUtils.getCurrentExtension();
 const Util = imports.misc.util;
 
@@ -29,6 +30,7 @@ const _ = Domain.gettext;
 
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+
 const aggregateMenu = Main.panel.statusArea.aggregateMenu;
 const powerIndicator = _getIndicators(aggregateMenu._power);
 const powerMenu = powerIndicator.menu.firstMenuItem.menu;
@@ -40,8 +42,68 @@ const powerProxy = powerIndicator._proxy;
 let sys_conservation = null;
 
 let conservation_level = 80;
+const conservation_level_min = 60;
 const conservation_hysteresis = 2;
 
+const ConservationLevelSlider = GObject.registerClass(
+    {
+        GTypeName: 'ConservationLevelSlider'
+    },
+    class ConservationLevelSlider extends PopupMenu.PopupBaseMenuItem{
+        _init(){
+            super._init({ activate: false })
+            this.slider = new Slider.Slider(conservation_level / 100);
+            this.slider.accessible_name = _('conservation level');
+            this._slider_icon = new St.Icon({icon_name: 'battery-good-charging',
+                style_class: 'popup-menu-icon'});
+
+            this.label = new St.Label({text: ''});
+            this.label.set_text(this.slider.value * 100 + "%")
+
+            this.add(this._slider_icon);
+            this.add_child(this.slider);
+            this.add(this.label);
+
+            // Connect menu signals to the slider
+            this.connect('button-press-event', (actor, event) => {
+                return this.slider.startDragging(event);
+            });
+            this.connect('key-press-event', (actor, event) => {
+                return this.slider.emit('key-press-event', event);
+            });
+            this.connect('scroll-event', (actor, event) => {
+                return this.slider.emit('scroll-event', event);
+            });
+
+            this.slider.connect('notify::value',
+                    this.onChange.bind(this));
+        }
+
+        onChange(actor, event){
+            this.label.set_text(this.slider.value * 100 + "%")
+            this.emit('notify::value', event);
+        }
+
+        getValue(){
+            return  this.slider.value * 100;
+        }
+
+        setValue(v){
+            v = Math.round(v);
+            if (v <= conservation_level_min){
+                v = conservation_level_min;
+            }
+            this.slider.value = v / 100;
+            return v;
+        }
+
+        destroy(){
+            this.slider.destroy();
+            this.label.destroy();
+            super.destroy()
+        }
+    }
+)
 
 const BatteryConservationIndicator = GObject.registerClass(
     {
@@ -63,7 +125,13 @@ const BatteryConservationIndicator = GObject.registerClass(
                 });
                 powerMenu.addMenuItem(this.conservationModeItem);
 
-                this._syncStatus();
+                this.sliderMenuItem = new ConservationLevelSlider();
+                this._sliderChangedId = this.sliderMenuItem.connect('notify::value',
+                    this._sliderChanged.bind(this));
+                powerMenu.addMenuItem(this.sliderMenuItem);
+
+                this._power_change_handle = powerProxy.connect('g-properties-changed', this.autoConservationMode.bind(this));
+                this.autoConservationMode();
 
             } else {
                 this.conservationModeItem = powerMenu.addAction(
@@ -73,27 +141,25 @@ const BatteryConservationIndicator = GObject.registerClass(
 
                 this._indicator.visible = false;
             }
+        }
 
-            this._power_change_handle = aggregateMenu._power._proxy.connect('g-properties-changed', this.autoConservationMode.bind(this));
-
-            this.autoConservationMode();
+        _sliderChanged(){
+            let value = this.sliderMenuItem.getValue();
+            conservation_level = this.sliderMenuItem.setValue(value);
+            this.autoConservationMode()
+        }
 
         autoConservationMode(){
-            const level = this._getBatteryLevel()
+            const level = powerProxy.Percentage;
+            const state = powerProxy.State;
+            console.log("autoConservationMode(), level=" + level + " conservation_level="+ conservation_level);
+
             if (level >= conservation_level){
-                this._setConservationMode(true)
+                this._setConservationMode(true);
             }
             if (level < conservation_level - conservation_hysteresis){
-                this._setConservationMode(false)
+                this._setConservationMode(false);
             }
-        }
-
-        _getBatteryStatus() {
-            return aggregateMenu._power._proxy.State
-        }
-
-        _getBatteryLevel() {
-            return aggregateMenu._power._proxy.Percentage
         }
 
         _syncStatus() {
@@ -112,6 +178,8 @@ const BatteryConservationIndicator = GObject.registerClass(
         destroy() {
             this._indicator.destroy();
             this.conservationModeItem.destroy();
+            this.sliderMenuItem.destroy();
+            powerProxy.disconnect(this._power_change_handle);
         }
     }
 );
