@@ -124,7 +124,7 @@ function _getIndicators(delegate) {
     return delegate.indicators;
 }
 
-function _auto_dev_discovery(search_path) {
+function _auto_dev_discovery(search_path, child_name) {
     let mod_path = Gio.file_new_for_path(search_path);
 
     let walker = mod_path.enumerate_children(
@@ -137,8 +137,8 @@ function _auto_dev_discovery(search_path) {
     while ((child = walker.next_file(null))) {
         if (child.get_is_symlink() && child.get_name().startsWith("VPC2004")) {
             // ideapad_device_ids[] from the kernel module ideapad_acpi.c
-            found = _auto_dev_discovery(`${search_path}/${child.get_name()}`);
-        } else if (child.get_name() == "conservation_mode") {
+            found = _auto_dev_discovery(`${search_path}/${child.get_name()}`, child_name);
+        } else if (child.get_name() == child_name) {
             log(`IdeaPad device FOUND at ${search_path}`);
             found = `${search_path}/${child.get_name()}`;
         }
@@ -160,7 +160,7 @@ function enable() {
 
     if (sys_conservation === null) {
         try {
-            sys_conservation = _auto_dev_discovery(sysfs_path);
+            sys_conservation = _auto_dev_discovery(sysfs_path, "conservation_mode");
 
             if (sys_conservation === null) {
                 throw new Error("Battery conservation mode not available.");
