@@ -157,7 +157,7 @@ const BatteryConservationIndicator = GObject.registerClass(
             const state = powerProxy.State;
             console.log("autoConservationMode(), level=" + level + " conservation_level="+ conservation_level);
 
-            if (level >= conservation_level){
+            if (level >= conservation_level || conservation_level == 60){
                 this._setConservationMode(true);
             }
             if (level < conservation_level - conservation_hysteresis){
