@@ -76,7 +76,7 @@ const ConservationLevelSlider = GObject.registerClass(
             });
 
             this.slider.connect('notify::value',
-                    this.onChange.bind(this));
+                this.onChange.bind(this));
         }
 
         onChange(actor, event){
