@@ -1,0 +1,6 @@
+KERNEL=="VPC2004:00", 
+SUBSYSTEM=="platform", 
+DRIVERS=="ideapad_acpi", 
+ACTION=="bind", 
+RUN+="/bin/chgrp ellep /sys%p/conservation_mode",
+RUN+="/bin/chmod g+w /sys%p/conservation_mode"

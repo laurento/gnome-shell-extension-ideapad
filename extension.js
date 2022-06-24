@@ -113,6 +113,8 @@ const BatteryConservationIndicator = GObject.registerClass(
         _init() {
             super._init();
 
+            this.file_handle = Gio.File.new_for_path(sys_conservation);
+
             this._indicator = this._addIndicator();
             this._indicator.icon_name = "emoji-nature-symbolic";
             powerIndicator.add_child(_getIndicators(this));
@@ -154,9 +156,8 @@ const BatteryConservationIndicator = GObject.registerClass(
 
         autoConservationMode(){
             const level = powerProxy.Percentage;
-            const state = powerProxy.State;
+            // const state = powerProxy.State;
             console.log("autoConservationMode(), level=" + level + " conservation_level="+ conservation_level);
-
             if (level >= conservation_level || conservation_level == 60){
                 this._setConservationMode(true);
             }
@@ -166,15 +167,16 @@ const BatteryConservationIndicator = GObject.registerClass(
         }
 
         _syncStatus() {
-            const status = Shell.get_file_contents_utf8_sync(sys_conservation);
-            const active = (status.trim() == "1");
+            const [, status, etag] = this.file_handle.load_contents(null);
+            const active = (status.toString().trim() == "1");
             this._indicator.visible = active;
             this.conservationModeItem.setToggleState(active);
         }
 
         _setConservationMode(enabled) {
             const new_status = (enabled) ? "1" : "0";
-            Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
+            this.file_handle.replace_contents(new_status, null, false,
+                Gio.FileCreateFlags.NONE, null)
             this._syncStatus();
         }
 
@@ -225,6 +227,10 @@ function init() {
 }
 
 let batteryConservationIndicator = null;
+
+function set_permissions(path){
+  Util.spawnCommandLine(`/bin/sh -c 'chgrp ideapad ${sys_conservation} >/dev/null && chown g+w ${sys_conservation} >/dev/null'`);
+}
 
 function enable() {
     let sysfs_path = "/sys/bus/platform/drivers/ideapad_acpi";
