@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.ideapad"
+    path="/org/gnome/shell/extensions/ideapad/">
+
+    <key type="i" name="conservation-level">
+      <default>80</default>
+      <summary>conservation level</summary>
+      <description>maximum charge capacity</description>
+      <range min="60" max="100"></range>
+    </key>
+
+    <key type="b" name="enabled">
+      <default>false</default>
+      <summary>Enable automatic battery conservation</summary>
+      <description>Enable automatic battery conservation</description>
+    </key>
+
+  </schema>
+
+</schemalist>

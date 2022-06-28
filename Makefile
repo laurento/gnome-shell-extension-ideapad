@@ -1,5 +1,8 @@
 all:	build install
 
+schema:
+	glib-compile-schemas schemas/
+
 translation:
 	xgettext --from-code=UTF-8 --output=po/ideapad.pot *.js
 

@@ -45,6 +45,21 @@ let sys_conservation = null;
 const conservation_level_min = 60;
 const conservation_hysteresis = 2;
 
+function getSettings () {
+    let GioSSS = Gio.SettingsSchemaSource;
+    let schemaSource = GioSSS.new_from_directory(
+      Me.dir.get_child("schemas").get_path(),
+      GioSSS.get_default(),
+      false
+    );
+    let schemaObj = schemaSource.lookup(
+      'org.gnome.shell.extensions.ideapad', true);
+    if (!schemaObj) {
+      throw new Error('cannot find schemas');
+    }
+    return new Gio.Settings({ settings_schema : schemaObj });
+  }
+
 const ConservationLevelSlider = GObject.registerClass(
     {
         GTypeName: 'ConservationLevelSlider'
@@ -114,7 +129,9 @@ const BatteryConservationIndicator = GObject.registerClass(
         _init() {
             super._init();
 
-            this.conservation_level = 80;
+            this.settings = getSettings();
+            this.conservation_level = this.settings.get_int('conservation-level');
+
             this.file_handle = Gio.File.new_for_path(sys_conservation);
 
             this._indicator = this._addIndicator();
@@ -153,6 +170,7 @@ const BatteryConservationIndicator = GObject.registerClass(
         _sliderChanged(){
             let value = this.sliderMenuItem.getValue();
             this.conservation_level = this.sliderMenuItem.setValue(value);
+            this.settings.set_int('conservation-level', this.conservation_level);
             this.autoConservationMode()
         }
 
