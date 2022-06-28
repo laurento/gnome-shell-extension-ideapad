@@ -16,6 +16,12 @@
       <description>Enable automatic battery conservation</description>
     </key>
 
+    <key type="b" name="boost">
+      <default>false</default>
+      <summary>Suspend automatic battery conservation until charger disconnect</summary>
+      <description>Suspend automatic battery conservation until charger disconnect</description>
+    </key>
+
   </schema>
 
 </schemalist>

@@ -25,6 +25,7 @@ const ByteArray = imports.byteArray;
 const Slider = imports.ui.slider;
 const Me = ExtensionUtils.getCurrentExtension();
 const Util = imports.misc.util;
+const UPower = imports.gi.UPowerGlib;
 
 const Domain = Gettext.domain(Me.metadata['gettext-domain']);
 const _ = Domain.gettext;
@@ -70,7 +71,7 @@ const ConservationLevelSlider = GObject.registerClass(
 
             this.slider = new Slider.Slider(conservation_level / 100);
             this.slider.accessible_name = _('conservation level');
-            this._slider_icon = new St.Icon({icon_name: 'battery-good-charging',
+            this._slider_icon = new St.Icon({icon_name: 'emoji-nature-symbolic',
                 style_class: 'popup-menu-icon'});
 
             this.label = new St.Label({text: ''});
@@ -131,6 +132,8 @@ const BatteryConservationIndicator = GObject.registerClass(
 
             this.settings = getSettings();
             this.conservation_level = this.settings.get_int('conservation-level');
+            this.enabled = this.settings.get_boolean('enabled');
+            this.boost = this.settings.get_boolean('boost');
 
             this.file_handle = Gio.File.new_for_path(sys_conservation);
 
@@ -139,14 +142,25 @@ const BatteryConservationIndicator = GObject.registerClass(
             powerIndicator.add_child(_getIndicators(this));
 
             if (sys_conservation !== null) {
+                // AutoConservationMode button
                 this.conservationModeItem = new PopupMenu.PopupSwitchMenuItem(
-                    _("Conservation Mode"), true);
+                    _("Auto Conservation Mode"), this.enabled);
 
                 this.conservationModeItem.connect('toggled', item => {
-                    this._setConservationMode(item.state);
+                    this._setAutoConservationMode(item.state);
                 });
                 powerMenu.addMenuItem(this.conservationModeItem);
 
+                // Boost mode button
+                this.boostModeItem = new PopupMenu.PopupSwitchMenuItem(
+                    _("Boost"), this.boost);
+
+                this.boostModeItem.connect('toggled', item => {
+                    this._setBoostMode(item.state);
+                });
+                powerMenu.addMenuItem(this.boostModeItem);
+
+                // ConservationLevelSlider
                 this.sliderMenuItem = new ConservationLevelSlider(this.conservation_level);
                 this._sliderChangedId = this.sliderMenuItem.connect('notify::value',
                     this._sliderChanged.bind(this));
@@ -175,22 +189,56 @@ const BatteryConservationIndicator = GObject.registerClass(
         }
 
         autoConservationMode(){
+            const state = powerProxy.State;
             const level = powerProxy.Percentage;
-            // const state = powerProxy.State;
-            log("autoConservationMode(), level=" + level + " conservation_level="+ this.conservation_level);
+
+            log("autoConservationMode(), level=" + level);
+            log("state: " + UPower.Device.state_to_string(state) + "(" + state+")" );
+            log("conservation_level=" + this.conservation_level);
+            log("enabled: " + this.enabled);
+            log("boost: " + this.boost);
+
+            if (state == UPower.DeviceState.DISCHARGING){
+                this._setBoostMode(false, false);
+            }
+
+            if (!this.enabled || this.boost) {
+                this._setConservationMode(false);
+                return;
+            }
+
             if (level >= this.conservation_level || this.conservation_level == 60){
                 this._setConservationMode(true);
             }
             if (level < this.conservation_level - conservation_hysteresis){
                 this._setConservationMode(false);
             }
+            //Main.notify('Charge complete', 'Boost charge is completed, the battery will be kept at 100% until disconnect');
+            //Main.notify('Boost finished', 'Upon reconnect conservation mode will be activated');
+
         }
 
         _syncStatus() {
             const [, status, etag] = this.file_handle.load_contents(null);
             const active = (ByteArray.toString(status).trim() == "1");
             this._indicator.visible = active;
-            this.conservationModeItem.setToggleState(active);
+            //this.conservationModeItem.setToggleState(active);
+            this.conservationModeItem.setToggleState(this.enabled);
+            this.boostModeItem.setToggleState(this.boost);
+        }
+
+        _setAutoConservationMode(enabled) {
+            this.enabled = enabled;
+            this.settings.set_boolean('enabled', enabled);
+            this.autoConservationMode();
+        }
+
+        _setBoostMode(enabled, apply=true) {
+            this.boost = enabled;
+            this.settings.set_boolean('boost', enabled);
+            if (apply){
+                this.autoConservationMode();
+            }
         }
 
         _setConservationMode(enabled) {
