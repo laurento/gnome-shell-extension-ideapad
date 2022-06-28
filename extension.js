@@ -21,6 +21,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const { Gio, GObject, Shell, St } = imports.gi;
 const Gettext = imports.gettext;
 const Main = imports.ui.main;
+const ByteArray = imports.byteArray;
 const Slider = imports.ui.slider;
 const Me = ExtensionUtils.getCurrentExtension();
 const Util = imports.misc.util;
@@ -168,7 +169,7 @@ const BatteryConservationIndicator = GObject.registerClass(
 
         _syncStatus() {
             const [, status, etag] = this.file_handle.load_contents(null);
-            const active = (status.toString().trim() == "1");
+            const active = (ByteArray.toString(status).trim() == "1");
             this._indicator.visible = active;
             this.conservationModeItem.setToggleState(active);
         }
