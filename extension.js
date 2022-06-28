@@ -198,8 +198,13 @@ const BatteryConservationIndicator = GObject.registerClass(
             log("enabled: " + this.enabled);
             log("boost: " + this.boost);
 
+            if (this.boost && state == UPower.DeviceState.FULLY_CHARGED){
+                Main.notify('Charge complete', 'Boost charge is completed, the battery will be kept at 100% until disconnect');
+            }
+
             if (state == UPower.DeviceState.DISCHARGING){
                 this._setBoostMode(false, false);
+                Main.notify('Boost finished', 'Upon reconnect conservation mode will be activated')
             }
 
             if (!this.enabled || this.boost) {
@@ -213,8 +218,6 @@ const BatteryConservationIndicator = GObject.registerClass(
             if (level < this.conservation_level - conservation_hysteresis){
                 this._setConservationMode(false);
             }
-            //Main.notify('Charge complete', 'Boost charge is completed, the battery will be kept at 100% until disconnect');
-            //Main.notify('Boost finished', 'Upon reconnect conservation mode will be activated');
 
         }
 
