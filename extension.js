@@ -42,7 +42,6 @@ const powerProxy = powerIndicator._proxy;
 // E.g.: "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
 let sys_conservation = null;
 
-let conservation_level = 80;
 const conservation_level_min = 60;
 const conservation_hysteresis = 2;
 
@@ -51,8 +50,9 @@ const ConservationLevelSlider = GObject.registerClass(
         GTypeName: 'ConservationLevelSlider'
     },
     class ConservationLevelSlider extends PopupMenu.PopupBaseMenuItem{
-        _init(){
+        _init(conservation_level){
             super._init({ activate: false })
+
             this.slider = new Slider.Slider(conservation_level / 100);
             this.slider.accessible_name = _('conservation level');
             this._slider_icon = new St.Icon({icon_name: 'battery-good-charging',
@@ -114,6 +114,7 @@ const BatteryConservationIndicator = GObject.registerClass(
         _init() {
             super._init();
 
+            this.conservation_level = 80;
             this.file_handle = Gio.File.new_for_path(sys_conservation);
 
             this._indicator = this._addIndicator();
@@ -129,7 +130,7 @@ const BatteryConservationIndicator = GObject.registerClass(
                 });
                 powerMenu.addMenuItem(this.conservationModeItem);
 
-                this.sliderMenuItem = new ConservationLevelSlider();
+                this.sliderMenuItem = new ConservationLevelSlider(this.conservation_level);
                 this._sliderChangedId = this.sliderMenuItem.connect('notify::value',
                     this._sliderChanged.bind(this));
                 powerMenu.addMenuItem(this.sliderMenuItem);
@@ -151,18 +152,18 @@ const BatteryConservationIndicator = GObject.registerClass(
 
         _sliderChanged(){
             let value = this.sliderMenuItem.getValue();
-            conservation_level = this.sliderMenuItem.setValue(value);
+            this.conservation_level = this.sliderMenuItem.setValue(value);
             this.autoConservationMode()
         }
 
         autoConservationMode(){
             const level = powerProxy.Percentage;
             // const state = powerProxy.State;
-            console.log("autoConservationMode(), level=" + level + " conservation_level="+ conservation_level);
-            if (level >= conservation_level || conservation_level == 60){
+            log("autoConservationMode(), level=" + level + " conservation_level="+ this.conservation_level);
+            if (level >= this.conservation_level || this.conservation_level == 60){
                 this._setConservationMode(true);
             }
-            if (level < conservation_level - conservation_hysteresis){
+            if (level < this.conservation_level - conservation_hysteresis){
                 this._setConservationMode(false);
             }
         }
