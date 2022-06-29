@@ -252,9 +252,14 @@ const BatteryConservationIndicator = GObject.registerClass(
         }
 
         destroy() {
+            // On exit always set conservation mode if enabled and not boosting
+            // Otherwise the battery may be fully charged when the laptop is locked
+            this._setConservationMode(this.enabled && !this.boost);
+
             this._indicator.destroy();
             this.conservationModeItem.destroy();
             this.sliderMenuItem.destroy();
+            this.boostModeItem.destroy();
             powerProxy.disconnect(this._power_change_handle);
         }
     }
