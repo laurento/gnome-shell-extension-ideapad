@@ -143,13 +143,13 @@ const BatteryConservationIndicator = GObject.registerClass(
 
             if (sys_conservation !== null) {
                 // AutoConservationMode button
-                this.conservationModeItem = new PopupMenu.PopupSwitchMenuItem(
+                this.autoConservationModeItem = new PopupMenu.PopupSwitchMenuItem(
                     _("Auto Conservation Mode"), this.enabled);
 
-                this.conservationModeItem.connect('toggled', item => {
+                this.autoConservationModeItem.connect('toggled', item => {
                     this._setAutoConservationMode(item.state);
                 });
-                powerMenu.addMenuItem(this.conservationModeItem);
+                powerMenu.addMenuItem(this.autoConservationModeItem);
 
                 // Boost mode button
                 this.boostModeItem = new PopupMenu.PopupSwitchMenuItem(
@@ -172,7 +172,7 @@ const BatteryConservationIndicator = GObject.registerClass(
                 this.autoConservationMode();
 
             } else {
-                this.conservationModeItem = powerMenu.addAction(
+                this.autoConservationModeItem = powerMenu.addAction(
                     _("Conservation mode is not available"),
                     function () {}
                 );
@@ -198,35 +198,46 @@ const BatteryConservationIndicator = GObject.registerClass(
             log("enabled: " + this.enabled);
             log("boost: " + this.boost);
 
-            if (this.boost && state == UPower.DeviceState.FULLY_CHARGED){
-                Main.notify('Charge complete', 'Boost charge is completed, the battery will be kept at 100% until disconnect');
-            }
+            if (this.boost){
+                if (state == UPower.DeviceState.FULLY_CHARGED){
+                    Main.notify('Charge complete', 'Boost charge is completed, the battery will be kept at 100% until disconnect');
+                }
 
-            if (state == UPower.DeviceState.DISCHARGING){
-                this._setBoostMode(false, false);
-                Main.notify('Boost finished', 'Upon reconnect conservation mode will be activated')
+                if (state == UPower.DeviceState.DISCHARGING){
+                    // end boost mode
+                    this._setBoostMode(false, false);
+                    Main.notify('Boost finished', 'Upon reconnect conservation mode will be activated')
+                }
             }
 
             if (!this.enabled || this.boost) {
                 this._setConservationMode(false);
                 return;
             }
-
-            if (level >= this.conservation_level || this.conservation_level == 60){
+            if (this.conservation_level == 60){
+                // always enable conservation mode when set to 60
                 this._setConservationMode(true);
+                return;
             }
+
+            if (level >= this.conservation_level){
+                this._setConservationMode(true);
+                return;
+            }
+
             if (level < this.conservation_level - conservation_hysteresis){
                 this._setConservationMode(false);
+                return;
             }
-
         }
 
         _syncStatus() {
+            //
             const [, status, etag] = this.file_handle.load_contents(null);
             const active = (ByteArray.toString(status).trim() == "1");
+            log("syncStatus: " + active)
             this._indicator.visible = active;
-            //this.conservationModeItem.setToggleState(active);
-            this.conservationModeItem.setToggleState(this.enabled);
+            this.autoConservationModeItem.setToggleState(this.enabled);
             this.boostModeItem.setToggleState(this.boost);
         }
 
@@ -257,7 +268,7 @@ const BatteryConservationIndicator = GObject.registerClass(
             this._setConservationMode(this.enabled && !this.boost);
 
             this._indicator.destroy();
-            this.conservationModeItem.destroy();
+            this.autoConservationModeItem.destroy();
             this.sliderMenuItem.destroy();
             this.boostModeItem.destroy();
             powerProxy.disconnect(this._power_change_handle);
@@ -322,7 +333,6 @@ function enable() {
             logError(e, "ideapad");
         }
     }
-
     batteryConservationIndicator = new BatteryConservationIndicator();
 }
 
