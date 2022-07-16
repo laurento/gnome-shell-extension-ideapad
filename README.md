@@ -36,8 +36,8 @@ $ echo "ideapad_laptop" | sudo tee -a /etc/modules
 ~~~
 
 # Wrong battery estimation displayed
-A very minor cosmetic issue does currently exist. However, if the wrong battery estimation displayed in GNOME bugs you, there is also a solution.
+Depending on the kernel version you are running, a minor cosmetic issue might still exist. However, if the permanent "Estimating..." battery status displayed in GNOME bugs you, there is also a solution.
 
-When battery conservation mode is enabled, uPower (at least v0.99.11) doesn't seem able to properly identify the battery status just after the charging stops at 60%. More in particular, looking at the relevant uPower source code, one can read `/* the battery isn't charging or discharging, it's just sitting there half full doing nothing: try to guess a state */`. Unfortunately, the guessing fails resulting in exotic battery charging time readings.
+Actually, this issue should be fixed in kernels 5.19+. If you are running an older kernel, you can try applying [the patch here](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=185d20694a8aceb4eda9fc1314cbaad0df0aab07). Thanks to Martino Fontana for pointing this out.
 
-I've already reported the issue upstream; you can find [my proposed patch in the bug report](https://gitlab.freedesktop.org/upower/upower/-/issues/120). The patch essentially puts the conservation mode in the game and, when the battery stops charging, uPower simply understands the reason why.
+Alternatively, you could use the patch I initially suggested in [this uPower merge request](https://gitlab.freedesktop.org/upower/upower/-/merge_requests/46). However, I would personally advice to go for the kernel patch. It is a much cleaner solution.
