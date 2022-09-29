@@ -8,12 +8,16 @@ Simply install the extension from the [official GNOME extensions website](https:
 
 In both cases, few additional steps are required. Please check the dedicate following section.
 
+In case you would like to have a look at the code, please consider that `master` branch targets GNOME Shell versions 43+. Previous versions are still supported in branch `pre-43`.
+
 # Usage
 The extension adds a new entry *Toggle Conservation Mode* to the panel and shows an icon on the status menu to indicate when the battery conservation mode is enabled.
 
 If your particular laptop model supports it, the conservation mode limits battery charging to 55-60% of its capacity to improve battery life. It is particularly useful when the laptop runs on external power most of the time.
 
-![](screenshot.png)
+| GNOME Shell < 43    | GNOME Shell >= 43      |
+|---------------------|------------------------|
+| ![](screenshot.png) | ![](screenshot-43.png) |
 
 # Additional Required Settings
 Your desktop user needs read-and-write access to a specific sysfs file that is normally owned by the root user. The easiest way to achieve that is using `sudo`. The following steps have been tested on Debian, but they should work on any modern GNU/Linux system. In case of doubts, please refer to your specific distribution documentation.
