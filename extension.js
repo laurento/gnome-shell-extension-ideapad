@@ -35,6 +35,18 @@ const _ = Domain.gettext;
 // E.g.: "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
 let sys_conservation = null;
 
+// Function to set toggle above background-apps
+function addQuickSettingsItems(items) {
+    // Add the items with the built-in function
+    QuickSettingsMenu._addItems(items);
+
+    // Ensure the tile(s) are above the background apps menu
+    for (const item of items) {
+        QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
+            QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
+    }
+};
+
 
 const ConservationToggle = GObject.registerClass(
 class ConservationToggle extends QuickSettings.QuickToggle {
@@ -87,7 +99,7 @@ class ConservationIndicator extends QuickSettings.SystemIndicator {
         this.quickSettingsItems.push(this._toggle);
         // Add the indicator to the panel and the toggle to the menu.
         QuickSettingsMenu._indicators.add_child(this);
-        QuickSettingsMenu._addItems(this.quickSettingsItems);
+        addQuickSettingsItems(this.quickSettingsItems);
     }
 
     _syncStatus() {
