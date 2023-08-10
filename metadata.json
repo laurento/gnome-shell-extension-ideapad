@@ -4,7 +4,7 @@
   "uuid": "ideapad@laurento.frittella",
   "gettext-domain": "ideapad",
   "shell-version": [
-    "44"
+    "45"
   ],
   "url": "https://github.com/laurento/gnome-shell-extension-ideapad",
   "version": 13
