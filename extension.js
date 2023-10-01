@@ -118,9 +118,9 @@ export default class IdeaPadExtension extends Extension {
                 if (sys_conservation === null) {
                     throw new Error('Battery conservation mode not available.');
                 }
-                log(`Device found at: ${sys_conservation}`);
+                console.info(`Device found at: ${sys_conservation}`);
             } catch (e) {
-                logError(e, this.metadata.name);
+                console.error(e, this.metadata.name);
             }
         }
 

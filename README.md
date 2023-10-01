@@ -8,7 +8,7 @@ Simply install the extension from the [official GNOME extensions website](https:
 
 In both cases, few additional steps are required. Please check the dedicate following section.
 
-In case you would like to have a look at the code, please consider that `master` branch targets GNOME Shell versions 43+. Previous versions are still supported in branch `pre-43`.
+In case you would like to have a look at the code, please consider that `master` branch targets the latest stable version of GNOME Shell. Previous versions are still supported in dedicated branches (e.g. `pre-43`).
 
 # Usage
 The extension adds a new entry *Toggle Conservation Mode* to the panel and shows an icon on the status menu to indicate when the battery conservation mode is enabled.
