@@ -17,18 +17,18 @@
 
 //Author: Laurento Frittella <laurento.frittella at gmail dot com>
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const { Gio, GObject, Shell, St } = imports.gi;
-const Gettext = imports.gettext;
-const Main = imports.ui.main;
-const Me = ExtensionUtils.getCurrentExtension();
-const Util = imports.misc.util;
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
 
-const QuickSettings = imports.ui.quickSettings;
-const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
+import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Util from 'resource:///org/gnome/shell/misc/util.js';
+import * as QuickSettings from 'resource:///org/gnome/shell/ui/quickSettings.js';
 
-const Domain = Gettext.domain(Me.metadata['gettext-domain']);
-const _ = Domain.gettext;
+const QuickSettingsMenu = Main.panel.statusArea.quickSettings;
 
 // MANUAL OVERRIDE
 // to disable the auto-discovery more, just set the absolute device path here
@@ -86,8 +86,7 @@ class ConservationIndicator extends QuickSettings.SystemIndicator {
 
         this.quickSettingsItems.push(this._toggle);
         // Add the indicator to the panel and the toggle to the menu.
-        QuickSettingsMenu._indicators.add_child(this);
-        QuickSettingsMenu._addItems(this.quickSettingsItems);
+        Main.panel.statusArea.quickSettings.addExternalIndicator(this);
     }
 
     _syncStatus() {
@@ -103,10 +102,11 @@ class ConservationIndicator extends QuickSettings.SystemIndicator {
     }
 });
 
-class IdeaPadExtension {
-    constructor() {
+export default class IdeaPadExtension extends Extension {
+    constructor(metadata) {
+        super(metadata);
+
         this._indicator = null;
-        ExtensionUtils.initTranslations(Me.metadata['gettext-domain']);
     }
 
     enable() {
@@ -120,7 +120,7 @@ class IdeaPadExtension {
                 }
                 log(`Device found at: ${sys_conservation}`);
             } catch (e) {
-                logError(e, Me.metadata.name);
+                logError(e, this.metadata.name);
             }
         }
 
@@ -155,8 +155,4 @@ class IdeaPadExtension {
 
         return found;
     }
-}
-
-function init() {
-    return new IdeaPadExtension();
 }
