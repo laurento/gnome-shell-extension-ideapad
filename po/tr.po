@@ -1,0 +1,22 @@
+# Lenovo IdeaPad goodies, GNOME shell extension.
+# Copyright (C) 2019 - 2022 Laurento Frittella
+# This file is distributed under the same license as the "Lenovo IdeaPad goodies" package.
+# Ulvican Kahya <ulvicankahya@gmail.com>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lenovo IdeaPad goodies, GNOME shell extension\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-29 17:25+0100\n"
+"PO-Revision-Date: 2023-12-08 21:29+0300\n"
+"Last-Translator: Ulvican Kahya (ulville) <ulvicankahya@gmail.com>\n"
+"Language-Team: \n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.1\n"
+
+#: extension.js:43
+msgid "Conservation Mode"
+msgstr "Pil Koruma Kipi"
