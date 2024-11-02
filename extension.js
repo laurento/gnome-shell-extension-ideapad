@@ -98,7 +98,15 @@ class ConservationIndicator extends QuickSettings.SystemIndicator {
 
     _setConservationMode(enabled) {
         const new_status = (enabled) ? '1' : '0';
-        Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
+        let authenticator;
+
+        if (Gio.file_new_for_path("/usr/bin/sudo").query_exists(null)) {
+            authenticator = "sudo";
+        } else if (Gio.file_new_for_path("/usr/bin/doas").query_exists(null)) {
+            authenticator = "doas";
+        }
+        
+        Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | ${authenticator} tee ${sys_conservation} >/dev/null'`);
     }
 });
 
