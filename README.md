@@ -20,6 +20,14 @@ If your particular laptop model supports it, the conservation mode limits batter
 | ![](screenshot.png) | ![](screenshot-43.png) |
 
 # Additional Required Settings
+
+## Make sure the `ideapad_laptop` kernel module gets loaded
+To make sure the `ideapad_laptop` kernel module gets loaded automatically at boot, simply add it to the file `/etc/modules`
+~~~
+$ echo "ideapad_laptop" | sudo tee -a /etc/modules
+~~~
+
+## For sudo users
 Your desktop user needs read-and-write access to a specific sysfs file that is normally owned by the root user. The easiest way to achieve that is using `sudo`. The following steps have been tested on Debian, but they should work on any modern GNU/Linux system. In case of doubts, please refer to your specific distribution documentation.
 
 * Depending on your distro, you need to use the group `sudo` (e.g. Debian and Ubuntu) or `wheel` (e.g. Arch and Fedora) here. In case of doubt, run the command `groups` in a terminal and see which of the two is listed in the output.
@@ -29,14 +37,27 @@ Your desktop user needs read-and-write access to a specific sysfs file that is n
   %sudo ALL=(ALL) NOPASSWD: /usr/bin/tee /sys/bus/platform/drivers/ideapad_acpi/VPC????\:??/conservation_mode
   ~~~
 
-* To make sure the `ideapad_laptop` kernel module gets loaded automatically at boot, simply add it to the file `/etc/modules`
-
 To summarize and for easy reference...
 ~~~
 # Don't forget to replace %sudo with %wheel if needed!
 #
 $ echo "%sudo ALL=(ALL) NOPASSWD: /usr/bin/tee /sys/bus/platform/drivers/ideapad_acpi/VPC????\:??/conservation_mode" | sudo tee /etc/sudoers.d/ideapad
 $ echo "ideapad_laptop" | sudo tee -a /etc/modules
+~~~
+
+## For doas users
+* Here we are using `VPC2004:00`, maybe you need to use other, so you can check that with `ls /sys/bus/platform/drivers/ideapad_acpi/ | grep VPC`
+
+  Add the following entry to your system doas configuration file ("/etc/doas.conf"), **Make sure to replace** `:wheel` with another group if needed.
+  ~~
+  permit nopass :wheel as root cmd tee args "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
+  ~~
+
+To summarize and for easy reference...
+~~~
+# Dont't forget to replace :wheel and VPC2004:00 if needed
+#
+$ echo -e "\n#ideapad conservation mode\npermit nopass :wheel as root cmd tee args /sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode" | doas tee -a /etc/doas.conf
 ~~~
 
 # Wrong battery estimation displayed
