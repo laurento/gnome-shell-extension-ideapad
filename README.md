@@ -46,12 +46,11 @@ $ echo "ideapad_laptop" | sudo tee -a /etc/modules
 ~~~
 
 ## For doas users
-* Here we are using `VPC2004:00`, maybe you need to use other, so you can check that with `ls /sys/bus/platform/drivers/ideapad_acpi/ | grep VPC`
-
-  Add the following entry to your system doas configuration file ("/etc/doas.conf"), **Make sure to replace** `:wheel` with another group if needed.
-  ~~
+  Add the following entry to your system doas configuration file ("/etc/doas.conf"), **Make sure to replace** `:wheel` with another group if needed.  
+  ~~~
   permit nopass :wheel as root cmd tee args "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
-  ~~
+  ~~~
+* Here we are using `VPC2004:00`, maybe you need to use other, you can check with:<br/>`ls /sys/bus/platform/drivers/ideapad_acpi/ | grep VPC`
 
 To summarize and for easy reference...
 ~~~
