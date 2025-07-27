@@ -98,7 +98,7 @@ class ConservationIndicator extends QuickSettings.SystemIndicator {
 
     _setConservationMode(enabled) {
         const new_status = (enabled) ? '1' : '0';
-        Util.spawnCommandLine(`/bin/sh -c 'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
+        sudo(`'echo ${new_status} | sudo tee ${sys_conservation} >/dev/null'`);
     }
 });
 
@@ -155,4 +155,9 @@ export default class IdeaPadExtension extends Extension {
 
         return found;
     }
+}
+
+function sudo(Str) {
+    let cmd = `pkexec --user root sh -c ${Str}`;
+    GLib.spawn_command_line_async(`sh -c "${cmd}; exit"`)
 }
