@@ -1,0 +1,7 @@
+# Rule to set group ownership and permissions for the conservation mode file
+# This allows members of the 'users' or 'power' group to write to the file
+# The wildcard KERNEL=="VPC*:*" matches the specific platform device
+ACTION=="add", SUBSYSTEM=="platform", DRIVERS=="ideapad_acpi", KERNEL=="VPC*:*", \
+  ATTR{conservation_mode}=="*", \
+  RUN+="/usr/bin/chown root:power /sys/%p/conservation_mode", \
+  RUN+="/usr/bin/chmod 664 /sys/%p/conservation_mode"
